@@ -8,6 +8,7 @@
 
 from ..Script import Script
 
+
 class ShowProgress(Script):
     def __init__(self):
         super().__init__()
@@ -33,6 +34,13 @@ class ShowProgress(Script):
                     "description": "This setting shows the remaining printing time.",
                     "type": "bool",
                     "default_value": true
+                },
+				"speed_factor":
+                {
+                    "label": "Speed factor",
+                    "description": "Tweak this value to get better estimates. [Cura estimate]/[actual print time]. Usually this value is less than 1, since Cura tends to be too optimistic.",
+                    "type": "float",
+                    "default_value": 1
                 }
             }
         }"""
@@ -41,31 +49,32 @@ class ShowProgress(Script):
         # get settings
         display_total_layers = self.getSettingValueByKey("display_total_layers")
         display_remaining_time = self.getSettingValueByKey("display_remaining_time")
+        speed_factor = self.getSettingValueByKey("speed_factor")
 
         # initialize global variables
         first_layer_index = 0
         time_total = 0
         number_of_layers = 0
         time_elapsed = 0
-        
+
         # if at least one of the settings is disabled, there is enough room on the display to display "layer"
         if not display_total_layers or not display_remaining_time:
             base_display_text = "layer "
         else:
             base_display_text = ""
-            
+
         # Search for the number of layers and the total time from the start code
         for index in range(len(data)):
             data_section = data[index]
-            if data_section.startswith(";LAYER:"): # We have everything we need, save the index of the first layer and exit the loop
+            if data_section.startswith(";LAYER:"):  # We have everything we need, save the index of the first layer and exit the loop
                 first_layer_index = index
                 break
             else:
                 for line in data_section.split("\n"):  # Seperate into lines
                     if line.startswith(";LAYER_COUNT:"):
-                        number_of_layers = int(line.split(":")[1]) # Save total layers in a variable
+                        number_of_layers = int(line.split(":")[1])  # Save total layers in a variable
                     elif line.startswith(";TIME:"):
-                        time_total = int(line.split(":")[1]) # Save total time in a variable
+                        time_total = int(line.split(":")[1])  # Save total time in a variable
 
         # for all layers...
         for layer_counter in range(number_of_layers):
@@ -76,15 +85,17 @@ class ShowProgress(Script):
 
             # create a list where each element is a single line of code within the layer
             lines = data[layer_index].split("\n")
-            
+
             # add the total number of layers if this option is checked
-            if display_total_layers:  
+            if display_total_layers:
                 display_text += "/" + str(number_of_layers)
 
             # if display_remaining_time is checked, it is calculated in this loop
             if display_remaining_time:
                 time_remaining_display = " | ETA "  # initialize the time display
-                m = (time_total - time_elapsed) // 60  # remaining time in minutes
+                m = (time_total - time_elapsed) // 60  # estimated time in minutes
+                m /= speed_factor  # correct for printing time
+                m = int(m)  # convert to integer
                 h, m = divmod(m, 60)  # convert to hours and minutes
 
                 # add the time remaining to the display_text
