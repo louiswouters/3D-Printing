@@ -35,7 +35,7 @@ class ShowProgress(Script):
                     "type": "bool",
                     "default_value": true
                 },
-				"speed_factor":
+                "speed_factor":
                 {
                     "label": "Speed factor",
                     "description": "Tweak this value to get better estimates. [Cura estimate]/[actual print time]. Usually this value is less than 1, since Cura tends to be too optimistic.",
