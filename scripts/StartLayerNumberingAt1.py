@@ -2,7 +2,7 @@
 # Author:   Louis Wouters
 # Date:     06-06-2020
 
-# Description:  This plugin will turn of the heated bed after a certain amount of layers or time has passed.
+# Description:  This plugin will increase all the layernumbers in the gcode comments by 1 to match the layercounter in Cura's preview
 
 from ..Script import Script
 
