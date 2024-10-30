@@ -52,7 +52,7 @@ class FilamentChangeAtStart(Script):
 
         number_of_cleaning_lines = self.getSettingValueByKey("number_of_cleaning_lines")
         insert_gcode = "G1 Z2.0 F3000 ; Move Z Axis up little to prevent scratching of Heat Bed\n"
-        insert_gcode += "M0 ; wait for user input\nG28 ; home\n"
+        insert_gcode += "M0 ; wait for user input\nG28 ; home\nG29 ; auto bed level\n"
         insert_gcode += "M117 Cleaning nozzle\nG1 X0.1 Y20 Z0.3 F5000.0 ; Move to start position\nG91\n"
         insert_gcode += "G1 Y180 F1500 E15 ; Up\nG1 X0.3 F5000 ; Right\nG1 Y-180 F1500.0 E15 ; Down\nG1 X0.3 F5000 ; Right\n" * number_of_cleaning_lines
         insert_gcode += "G1 Z1.7 F3000 ; Move Z Axis up little to prevent scratching of Heat Bed\nG1 X5  Z-1.7 F5000 ; Move over to prevent blob squish\nG90\nG92 E0 ; Reset Extruder\n"
